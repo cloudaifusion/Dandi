@@ -18,7 +18,7 @@ interface ApiKey {
 }
 
 const PLAN = {
-  name: "Researcher1",
+  name: "Researcher",
   limit: 1000,
   used: 24,
 };
