@@ -1,9 +1,9 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Notification from '../dashboards/Notification';
 
-export default function Protected() {
+function ProtectedContent() {
   const searchParams = useSearchParams();
   const apiKey = searchParams.get('apiKey');
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
@@ -46,5 +46,24 @@ export default function Protected() {
         {loading && <p className="mt-4 text-gray-500">Validating API key...</p>}
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md mt-20">
+        <h1 className="text-2xl font-bold mb-6">Protected Page</h1>
+        <p>Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function Protected() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ProtectedContent />
+    </Suspense>
   );
 } 
