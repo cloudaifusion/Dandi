@@ -13,18 +13,20 @@ function ProtectedContent() {
     const validateKey = async () => {
       if (!apiKey) return;
       setLoading(true);
-      // Dynamically import supabase client to avoid SSR issues
-      const { supabase } = await import('../api/supabase');
-      const { data, error } = await supabase
-        .from('api_keys')
-        .select('*')
-        .eq('key', apiKey)
-        .eq('status', 'active')
-        .single();
-      if (error || !data) {
-        setNotification({ message: 'Invalid API Key', type: 'error' });
-      } else {
-        setNotification({ message: 'valid API key, /protected can be accessed', type: 'success' });
+      try {
+        const res = await fetch('/api/validate-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey }),
+        });
+        const result = await res.json();
+        if (result.valid) {
+          setNotification({ message: 'valid API key, /protected can be accessed', type: 'success' });
+        } else {
+          setNotification({ message: 'Invalid API Key', type: 'error' });
+        }
+      } catch (err) {
+        setNotification({ message: 'Error validating API Key', type: 'error' });
       }
       setLoading(false);
     };
