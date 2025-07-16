@@ -29,16 +29,22 @@ export async function POST(request: NextRequest) {
      }
  
      // Placeholder for actual summarizer logic, now with readmeContent
+     // Refactored: Call summarizer logic from chain.ts
+     const { summarizeReadme } = await import("./chain");
+     const summaryResult = await summarizeReadme(readmeContent);
      return NextResponse.json(
        {
          success: true,
          message: "API key validated. Summarizer logic goes here.",
          readme: readmeContent,
+         summary: summaryResult.summary,
+         cool_facts: summaryResult.cool_facts,
        },
        { status: 200 }
      );
     
   } catch (err) {
+    console.error('Error in github-summarizer POST:', err);
     return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
   }
     // Helper function to fetch README.md content from a GitHub repo
@@ -66,6 +72,15 @@ export async function POST(request: NextRequest) {
         return null;
       }
     }
+ 
 
    
-  }
+  // Yes, the README file is handled correctly:
+  // - The fetchReadme function parses the GitHub URL to extract the owner and repo.
+  // - It attempts to fetch the README.md file from both the "main" and "master" branches using the raw.githubusercontent.com URL.
+  // - If the README.md is found (HTTP 200), it returns the file content as text.
+  // - If not found or an error occurs, it returns null.
+  // - The main handler checks if readmeContent is null and returns a 404 error if so.
+  // - Otherwise, it includes the README content in the JSON response.
+  // This approach covers the common cases for public repositories with a README.md in the root of the main or master branch.
+  }  

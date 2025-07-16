@@ -6,6 +6,7 @@ import ApiKeyModal from './ApiKeyModal';
 import ApiKeysTable from './ApiKeysTable';
 import Notification from './Notification';
 import { useApiKeys } from './useApiKeys';
+import { useSession, signIn, signOut } from "next-auth/react";
 
 interface ApiKey {
   id: string;
@@ -48,12 +49,38 @@ export default function Dashboard() {
     copyToClipboard,
   } = useApiKeys();
 
+  const { data: session, status } = useSession();
+
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="bg-white p-8 rounded shadow-md w-full max-w-md mt-20 flex flex-col items-center">
+          <h1 className="text-2xl font-bold mb-6">Sign in Required</h1>
+          <p className="mb-6 text-gray-700">You must be signed in to manage API Keys.</p>
+          <button
+            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-base h-12 px-5 w-full md:w-[200px] bg-indigo-600 text-white hover:bg-indigo-700"
+            onClick={() => signIn("google")}
+          >
+            Sign in with Google
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -78,6 +105,23 @@ export default function Dashboard() {
         />
       )}
       <div className={`flex-1 bg-gray-50 py-10 px-2 overflow-auto transition-all duration-200 ${collapsed ? 'md:ml-16' : 'md:ml-64'}`}>
+        {/* Header with sign in/out */}
+        <div className="flex justify-end items-center mb-6">
+          {session ? (
+            <div className="flex items-center gap-3">
+              {session.user?.image && (
+                <img src={session.user.image} alt="User avatar" className="w-8 h-8 rounded-full border" />
+              )}
+              <span className="font-medium text-gray-900 text-sm">{session.user?.name}</span>
+              <button
+                className="ml-2 px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200"
+                onClick={() => signOut()}
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : null}
+        </div>
         <Notification
           message={notification}
           type={notification === 'API Key deleted' ? 'error' : 'success'}
