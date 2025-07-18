@@ -19,7 +19,7 @@ interface ApiKey {
 }
 
 const PLAN = {
-  name: "Researcher",
+  name: "Dandi API",
   limit: 1000,
   used: 24,
 };
