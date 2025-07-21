@@ -23,28 +23,28 @@ export default function LandingPage() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b">
+      <header className="px-2 sm:px-4 lg:px-6 h-16 flex items-center border-b w-full">
         <Link className="flex items-center justify-center" href="/">
           <Github className="h-8 w-8 mr-2" />
-          <span className="font-bold text-xl">Dandi Github Analyzer</span>
+          <span className="font-bold text-lg sm:text-xl">Dandi Github Analyzer</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
+        <nav className="ml-auto flex gap-2 sm:gap-4 md:gap-6">
+          <Link className="text-xs sm:text-sm font-medium hover:underline underline-offset-4" href="#features">
             Features
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
+          <Link className="text-xs sm:text-sm font-medium hover:underline underline-offset-4" href="#pricing">
             Pricing
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#about">
+          <Link className="text-xs sm:text-sm font-medium hover:underline underline-offset-4" href="#about">
             About
           </Link>
         </nav>
-        <div className="ml-4 flex gap-2 items-center">
+        <div className="ml-2 flex gap-1 sm:gap-2 items-center">
           <Link href="/dashboards">
             <button
-              className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-md transition-colors mr-2"
+              className="px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-white shadow-md transition-colors mr-1 sm:mr-2 w-full sm:w-auto"
               style={{ background: 'linear-gradient(90deg, #a259ff 0%, #f24e1e 50%, #ffc700 100%)', boxShadow: '0 2px 8px 0 rgba(162,89,255,0.15)' }}
               type="button"
             >
@@ -52,15 +52,15 @@ export default function LandingPage() {
             </button>
           </Link>
           {status === "loading" ? (
-            <span className="text-sm text-gray-500">Loading...</span>
+            <span className="text-xs sm:text-sm text-gray-500">Loading...</span>
           ) : session ? (
             <>
               {session.user?.image && (
-                <img src={session.user.image} alt="User avatar" className="w-8 h-8 rounded-full border" />
+                <img src={session.user.image} alt="User avatar" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border" />
               )}
-              <span className="font-medium text-gray-900 text-sm mx-2">{session.user?.name}</span>
+              <span className="font-medium text-gray-900 text-xs sm:text-sm mx-1 sm:mx-2">{session.user?.name}</span>
               <button
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-md transition-colors"
+                className="px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-white shadow-md transition-colors w-full sm:w-auto"
                 style={{ background: 'linear-gradient(90deg, #a259ff 0%, #f24e1e 50%, #ffc700 100%)', boxShadow: '0 2px 8px 0 rgba(162,89,255,0.15)' }}
                 onClick={() => signOut()}
               >
@@ -69,7 +69,7 @@ export default function LandingPage() {
             </>
           ) : (
             <button
-              className="rounded-lg transition-colors flex items-center justify-center font-semibold text-base h-10 px-5 text-white shadow-md"
+              className="rounded-lg transition-colors flex items-center justify-center font-semibold text-xs sm:text-base h-10 px-4 sm:px-5 text-white shadow-md w-full sm:w-auto"
               style={{ background: 'linear-gradient(90deg, #a259ff 0%, #f24e1e 50%, #ffc700 100%)', boxShadow: '0 2px 8px 0 rgba(162,89,255,0.15)' }}
               onClick={() => signIn("google")}
             >
@@ -79,10 +79,10 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-          <div className="container px-4 md:px-6">
+        <section className="w-full py-8 sm:py-12 md:py-24 lg:py-32 xl:py-48">
+          <div className="container max-w-7xl px-2 sm:px-4 md:px-6 mx-auto">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
@@ -90,24 +90,24 @@ export default function LandingPage() {
                     <Zap className="w-3 h-3 mr-1" />
                     AI-Powered Insights
                   </Badge>
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                     Unlock Deep Insights from Any GitHub Repository
                   </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                  <p className="max-w-[90vw] sm:max-w-[600px] text-muted-foreground text-sm sm:text-base md:text-xl">
                     Get comprehensive analysis, trending metrics, and actionable insights from open source repositories.
                     Track stars, pull requests, releases, and discover hidden gems in the GitHub ecosystem.
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button size="lg" className="h-12">
+                <div className="flex flex-col gap-2 min-[400px]:flex-row w-full">
+                  <Button size="lg" className="h-12 w-full min-[400px]:w-auto">
                     Start Analyzing
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="lg" className="h-12 bg-transparent">
+                  <Button variant="outline" size="lg" className="h-12 bg-transparent w-full min-[400px]:w-auto">
                     View Demo
                   </Button>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row items-center gap-2">
                   <div className="flex items-center gap-1">
                     <Check className="h-4 w-4 text-green-500" />
                     Free tier available
@@ -118,14 +118,14 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-center">
-                <div className="relative">
+              <div className="flex items-center justify-center mt-6 lg:mt-0">
+                <div className="relative w-full max-w-[90vw] sm:max-w-none">
                   <Image
                     src="/placeholder.svg?height=400&width=600"
                     width="600"
                     height="400"
                     alt="Dandi Github Analyzer Dashboard"
-                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover shadow-2xl"
+                    className="mx-auto aspect-video overflow-hidden rounded-xl object-cover shadow-2xl w-full"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-xl" />
                 </div>
