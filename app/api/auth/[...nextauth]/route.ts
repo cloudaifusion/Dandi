@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { supabaseClient } from "../../supabase-server";
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -10,7 +10,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile }: any) {
       if (!user?.email) {
         console.error("No email provided by Google");
         return false;
@@ -53,7 +53,7 @@ const handler = NextAuth({
         return true;
       }
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       // Add user ID to session if needed
       if (session.user?.email) {
         try {
@@ -78,6 +78,8 @@ const handler = NextAuth({
     signIn: '/auth',
     error: '/auth/error',
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST }; 

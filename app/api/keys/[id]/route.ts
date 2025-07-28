@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { supabaseClient } from '../../supabase-server';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 // Helper function to get user ID from session
 async function getUserIdFromSession() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     return null;
   }
