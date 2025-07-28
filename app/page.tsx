@@ -18,6 +18,7 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { useSession, signIn, signOut } from "next-auth/react";
+import { ApiDemo } from "@/components/ApiDemo";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -212,6 +213,24 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* API Demo Section */}
+        <section className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="space-y-2">
+                <Badge variant="secondary">Live Demo</Badge>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Try Our API Right Now</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  Experience the power of our GitHub repository analyzer with this interactive demo.
+                </p>
+              </div>
+            </div>
+            <div className="mt-12">
+              <ApiDemo />
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section id="pricing" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
@@ -263,7 +282,7 @@ export default function LandingPage() {
 
               {/* Pro Tier */}
               <Card className="relative border-primary">
-                <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">Most Popular</Badge>
+              <Badge className="absolute -top-2 right-4 bg-orange-500 hover:bg-orange-600">Coming Soon</Badge>
                 <CardHeader>
                   <CardTitle className="text-2xl">Pro</CardTitle>
                   <CardDescription>For serious developers and teams</CardDescription>
@@ -296,12 +315,13 @@ export default function LandingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Start Pro Trial</Button>
+                <Button className="w-full" disabled>Start Pro Trial</Button>
                 </CardFooter>
               </Card>
 
               {/* Enterprise Tier */}
               <Card className="relative">
+              <Badge className="absolute -top-2 right-4 bg-orange-500 hover:bg-orange-600">Coming Soon</Badge>
                 <CardHeader>
                   <CardTitle className="text-2xl">Enterprise</CardTitle>
                   <CardDescription>For large teams and organizations</CardDescription>
@@ -334,7 +354,7 @@ export default function LandingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full bg-transparent" variant="outline">
+                  <Button className="w-full bg-transparent" variant="outline" disabled>
                     Contact Sales
                   </Button>
                 </CardFooter>
