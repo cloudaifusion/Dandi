@@ -8,6 +8,7 @@ interface ApiKey {
   createdAt: string;
   lastUsed?: string;
   usage?: number;
+  limit?: number;
 }
 
 interface ApiKeysTableProps {
@@ -35,6 +36,7 @@ const ApiKeysTable: React.FC<ApiKeysTableProps> = ({
         <tr className="border-b border-gray-200">
           <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Name</th>
           <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Usage</th>
+          <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Limit</th>
           <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Key</th>
           <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Options</th>
         </tr>
@@ -46,6 +48,7 @@ const ApiKeysTable: React.FC<ApiKeysTableProps> = ({
             <tr key={key.id} className="border-b last:border-0 border-gray-100 hover:bg-gray-50">
               <td className="px-4 py-2 text-sm text-gray-900 font-medium">{key.name}</td>
               <td className="px-4 py-2 text-sm text-gray-700">{key.usage ?? 0}</td>
+              <td className="px-4 py-2 text-sm text-gray-700">{key.limit ?? 1000}</td>
               <td className="px-4 py-2 text-sm font-mono">
                 <span className="bg-gray-100 px-2 py-1 rounded select-all font-semibold tracking-wider">
                   {isVisible ? key.key : key.key.slice(0, 5) + "-" + "*".repeat(20)}

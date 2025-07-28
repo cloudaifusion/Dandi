@@ -3,9 +3,9 @@ import React from 'react';
 interface ApiKeyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: { name: string; status: 'active' | 'inactive' }) => void;
-  formData: { name: string; status: 'active' | 'inactive' };
-  setFormData: (data: { name: string; status: 'active' | 'inactive' }) => void;
+  onSubmit: (formData: { name: string; status: 'active' | 'inactive'; limit: number }) => void;
+  formData: { name: string; status: 'active' | 'inactive'; limit: number };
+  setFormData: (data: { name: string; status: 'active' | 'inactive'; limit: number }) => void;
   editingKey: boolean;
 }
 
@@ -44,7 +44,7 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
                 required
               />
             </div>
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
@@ -56,6 +56,21 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rate Limit
+              </label>
+              <input
+                type="number"
+                value={formData.limit}
+                onChange={(e) => setFormData({ ...formData, limit: parseInt(e.target.value) || 1000 })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="1000"
+                min="1"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Maximum number of API requests allowed</p>
             </div>
             <div className="flex justify-end space-x-3">
               <button

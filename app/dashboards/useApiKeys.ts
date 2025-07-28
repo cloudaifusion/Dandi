@@ -8,13 +8,14 @@ export interface ApiKey {
   createdAt: string;
   lastUsed?: string;
   usage?: number;
+  limit?: number;
 }
 
 export function useApiKeys() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingKey, setEditingKey] = useState<ApiKey | null>(null);
-  const [formData, setFormData] = useState({ name: '', status: 'active' as 'active' | 'inactive' });
+  const [formData, setFormData] = useState({ name: '', status: 'active' as 'active' | 'inactive', limit: 1000 });
   const [visibleKeyId, setVisibleKeyId] = useState<string | null>(null);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
@@ -45,12 +46,16 @@ export function useApiKeys() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name,
+          status: formData.status,
+          limit: formData.limit,
+        }),
       });
       const result = await response.json();
       if (result.success) {
         setApiKeys([...apiKeys, { ...result.data, usage: 0 }]);
-        setFormData({ name: '', status: 'active' });
+        setFormData({ name: '', status: 'active', limit: 1000 });
         setIsModalOpen(false);
         setNotification('API Key created');
         setTimeout(() => setNotification(null), 1500);
@@ -63,22 +68,22 @@ export function useApiKeys() {
   const handleUpdate = async () => {
     if (!editingKey) return;
     try {
-      const response = await fetch('/api/keys', {
+      const response = await fetch(`/api/keys/${editingKey.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: editingKey.id,
           name: formData.name,
           status: formData.status,
+          limit: formData.limit,
         }),
       });
       const result = await response.json();
       if (result.success) {
         setApiKeys(apiKeys.map(key => key.id === editingKey.id ? { ...result.data, usage: key.usage } : key));
         setEditingKey(null);
-        setFormData({ name: '', status: 'active' });
+        setFormData({ name: '', status: 'active', limit: 1000 });
         setIsModalOpen(false);
         setNotification('API Key updated');
         setTimeout(() => setNotification(null), 1500);
@@ -91,7 +96,7 @@ export function useApiKeys() {
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this API key?')) {
       try {
-        const response = await fetch(`/api/keys?id=${id}`, {
+        const response = await fetch(`/api/keys/${id}`, {
           method: 'DELETE',
         });
         const result = await response.json();
@@ -108,13 +113,13 @@ export function useApiKeys() {
 
   const openEditModal = (key: ApiKey) => {
     setEditingKey(key);
-    setFormData({ name: key.name, status: key.status });
+    setFormData({ name: key.name, status: key.status, limit: key.limit || 1000 });
     setIsModalOpen(true);
   };
 
   const openCreateModal = () => {
     setEditingKey(null);
-    setFormData({ name: '', status: 'active' });
+    setFormData({ name: '', status: 'active', limit: 1000 });
     setIsModalOpen(true);
   };
 
