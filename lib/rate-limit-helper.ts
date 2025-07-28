@@ -73,30 +73,22 @@ export function createSimpleGetEndpoint(endpointName: string, incrementBy: numbe
  */
 export function createDataProcessingEndpoint(endpointName: string, incrementBy: number = 1) {
   return withRateLimit(async (request: NextRequest, rateLimitInfo: any) => {
-    try {
-      const { data } = await request.json();
-      
-      // Your data processing logic here
-      const processedData = {
-        ...data,
-        processedAt: new Date().toISOString(),
-        processedBy: endpointName
-      };
-      
-      const result = {
-        success: true,
-        message: `${endpointName} processed successfully`,
-        data: processedData
-      };
-      
-      return createRateLimitedResponse(result, rateLimitInfo);
-      
-    } catch (error) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid request data' },
-        { status: 400 }
-      );
-    }
+    const { data } = await request.json();
+    
+    // Your data processing logic here
+    const processedData = {
+      ...data,
+      processedAt: new Date().toISOString(),
+      processedBy: endpointName
+    };
+    
+    const result = {
+      success: true,
+      message: `${endpointName} processed successfully`,
+      data: processedData
+    };
+    
+    return createRateLimitedResponse(result, rateLimitInfo);
   }, {
     endpoint: endpointName,
     incrementBy
