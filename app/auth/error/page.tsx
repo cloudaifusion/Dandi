@@ -2,8 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-export default function AuthError() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
 
@@ -53,5 +54,42 @@ export default function AuthError() {
         )}
       </div>
     </div>
+  );
+}
+
+function AuthErrorFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">Authentication Error</h1>
+        <p className="text-gray-700 mb-6">
+          An error occurred during authentication.
+        </p>
+        
+        <div className="space-y-3">
+          <Link 
+            href="/auth"
+            className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
+          >
+            Try Again
+          </Link>
+          
+          <Link 
+            href="/"
+            className="block w-full bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300 text-center"
+          >
+            Go Home
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthError() {
+  return (
+    <Suspense fallback={<AuthErrorFallback />}>
+      <AuthErrorContent />
+    </Suspense>
   );
 } 
