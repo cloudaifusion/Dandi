@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "../components/ui/textarea"
 import { Loader2, Play, Book, Copy, Check } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 const defaultPayload = {
   githubUrl: "https://github.com/assafelovic/gpt-researcher",
@@ -26,54 +28,31 @@ export function ApiDemo() {
   const [response, setResponse] = useState(JSON.stringify(mockResponse, null, 2))
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const { data: session, status } = useSession()
+  const router = useRouter()
 
   const handleSendRequest = async () => {
-    setIsLoading(true)
-
-    try {
-      // Parse the payload to validate JSON
-      const parsedPayload = JSON.parse(payload)
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // For demo purposes, we'll return different mock responses based on the URL
-      let mockResult = mockResponse
-
-      if (parsedPayload.githubUrl?.includes("facebook/react")) {
-        mockResult = {
-          summary:
-            "React is a JavaScript library for building user interfaces, maintained by Facebook and the community. It lets you compose complex UIs from small and isolated pieces of code called components.",
-          cool_facts: [
-            "React has over 200k stars on GitHub and is one of the most popular JavaScript libraries.",
-            "The library was first released in 2013 and has revolutionized frontend development with its component-based architecture.",
-          ],
-        }
-      } else if (parsedPayload.githubUrl?.includes("microsoft/vscode")) {
-        mockResult = {
-          summary:
-            "Visual Studio Code is a lightweight but powerful source code editor which runs on your desktop and is available for Windows, macOS and Linux. It comes with built-in support for JavaScript, TypeScript and Node.js.",
-          cool_facts: [
-            "VS Code has over 150k stars and is the most popular code editor among developers.",
-            "It supports over 1000 programming languages through extensions and has a marketplace with thousands of extensions.",
-          ],
-        }
-      }
-
-      setResponse(JSON.stringify(mockResult, null, 2))
+    // Check authentication status
+    if (status === "loading") {
       toast({
-        title: "Success!",
-        description: "Repository analyzed successfully.",
+        title: "Loading...",
+        description: "Please wait while we check your authentication status.",
       })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Invalid JSON payload. Please check your syntax.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+      return
     }
+
+    if (!session) {
+      // User is not authenticated, redirect to login
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use the API demo.",
+      })
+      router.push("/auth")
+      return
+    }
+
+    // User is authenticated, redirect to playground
+    router.push("/playground")
   }
 
   const copyToClipboard = async (text: string) => {
@@ -125,16 +104,16 @@ export function ApiDemo() {
               placeholder="Enter JSON payload..."
             />
           </div>
-          <Button onClick={handleSendRequest} disabled={isLoading} className="w-full">
-            {isLoading ? (
+          <Button onClick={handleSendRequest} disabled={status === "loading"} className="w-full">
+            {status === "loading" ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing Repository...
+                Checking Authentication...
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 mr-2" />
-                Send Request
+                Try API Demo
               </>
             )}
           </Button>

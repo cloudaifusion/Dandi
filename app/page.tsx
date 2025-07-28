@@ -19,9 +19,25 @@ import Link from "next/link"
 import Image from "next/image"
 import { useSession, signIn, signOut } from "next-auth/react";
 import { ApiDemo } from "@/components/ApiDemo";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const handleStartAnalysis = () => {
+    if (status === "loading") {
+      return; // Wait for authentication status to load
+    }
+    
+    if (session) {
+      // User is authenticated, redirect to playground
+      router.push("/playground");
+    } else {
+      // User is not authenticated, redirect to login
+      router.push("/auth");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -100,8 +116,13 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row w-full">
-                  <Button size="lg" className="h-12 w-full min-[400px]:w-auto">
-                    Start Analyzing
+                  <Button 
+                    size="lg" 
+                    className="h-12 w-full min-[400px]:w-auto"
+                    onClick={handleStartAnalysis}
+                    disabled={status === "loading"}
+                  >
+                    {status === "loading" ? "Loading..." : "Start Analyzing"}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   <Button variant="outline" size="lg" className="h-12 bg-transparent w-full min-[400px]:w-auto">
@@ -274,8 +295,13 @@ export default function LandingPage() {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full bg-transparent" variant="outline">
-                    Get Started Free
+                  <Button 
+                    className="w-full bg-transparent" 
+                    variant="outline"
+                    onClick={handleStartAnalysis}
+                    disabled={status === "loading"}
+                  >
+                    {status === "loading" ? "Loading..." : "Get Started Free"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -374,8 +400,13 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button size="lg" className="h-12">
-                  Start Free Analysis
+                <Button 
+                  size="lg" 
+                  className="h-12"
+                  onClick={handleStartAnalysis}
+                  disabled={status === "loading"}
+                >
+                  {status === "loading" ? "Loading..." : "Start Free Analysis"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="lg" className="h-12 bg-transparent">
