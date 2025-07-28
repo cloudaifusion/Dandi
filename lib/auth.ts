@@ -1,8 +1,8 @@
-import NextAuth from "next-auth";
+import { getServerSession } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { supabaseClient } from "../../supabase-server";
+import { supabaseClient } from "../app/api/supabase-server";
 
-const handler = NextAuth({
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -78,6 +78,9 @@ const handler = NextAuth({
     signIn: '/auth',
     error: '/auth/error',
   },
-});
+};
 
-export { handler as GET, handler as POST }; 
+// Helper function to get server session
+export async function getServerSessionHelper() {
+  return await getServerSession(authOptions);
+} 
