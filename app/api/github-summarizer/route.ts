@@ -35,6 +35,15 @@ async function handleGitHubSummarizer(
   try {
     const { githubUrl } = await request.json();
     
+    if (!githubUrl) {
+      return NextResponse.json(
+        { success: false, error: "githubUrl is required" },
+        { status: 400 }
+      );
+    }
+    
+    console.log('Processing GitHub URL:', githubUrl);
+    
     // Fetch the README.md content
     const readmeContent = await fetchReadme(githubUrl);
 
@@ -45,24 +54,38 @@ async function handleGitHubSummarizer(
       );
     }
 
-    // Call summarizer logic from chain.ts
-    const { summarizeReadme } = await import("./chain");
-    const summaryResult = await summarizeReadme(readmeContent);
-    
-    const responseData = {
-      success: true,
-      message: "API key validated. Summarizer logic goes here.",
-      readme: readmeContent,
-      summary: summaryResult.summary,
-      cool_facts: summaryResult.cool_facts,
-    };
+    console.log('README content fetched, length:', readmeContent.length);
 
-    // Create response with rate limit info included
-    return createRateLimitedResponse(responseData, rateLimitInfo);
+    // Call summarizer logic from chain.ts
+    try {
+      const { summarizeReadme } = await import("./chain");
+      const summaryResult = await summarizeReadme(readmeContent);
+      
+      const responseData = {
+        success: true,
+        message: "Repository summarized successfully",
+        readme: readmeContent,
+        summary: summaryResult.summary,
+        cool_facts: summaryResult.cool_facts,
+      };
+
+      // Create response with rate limit info included
+      return createRateLimitedResponse(responseData, rateLimitInfo);
+    } catch (summarizerError) {
+      console.error('Error in summarizer:', summarizerError);
+      return NextResponse.json(
+        { success: false, error: "Failed to summarize repository content" },
+        { status: 500 }
+      );
+    }
     
   } catch (err) {
     console.error('Error in github-summarizer POST:', err);
-    return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Invalid request',
+      details: err instanceof Error ? err.message : 'Unknown error'
+    }, { status: 400 });
   }
 }
 

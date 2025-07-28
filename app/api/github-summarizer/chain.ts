@@ -20,22 +20,56 @@ const summarizerPrompt = ChatPromptTemplate.fromMessages([
   ["human", "{readme}"],
 ]);
 
-// LLM setup
-const llm = new ChatOpenAI({
-  model: "gpt-4o",
-  temperature: 0,
-});
+// LLM setup - check if OpenAI API key is available
+let llm: ChatOpenAI | null = null;
+let summarizerChain: any = null;
 
-// Chain with strict structured output
-const summarizerChain = summarizerPrompt.pipe(
-  llm.withStructuredOutput(summarySchema, { name: "repo_summary" })
-);
+try {
+  if (process.env.OPENAI_API_KEY) {
+    llm = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+    });
+
+    // Chain with strict structured output
+    summarizerChain = summarizerPrompt.pipe(
+      llm.withStructuredOutput(summarySchema, { name: "repo_summary" })
+    );
+  }
+} catch (error) {
+  console.error('Failed to initialize OpenAI client:', error);
+}
 
 // Exported function to summarize README content
 export async function summarizeReadme(readme: string): Promise<{ summary: string; cool_facts: string[] }> {
-  const result = await summarizerChain.invoke({ readme });
-  return {
-    summary: result.summary,
-    cool_facts: result.cool_facts,
-  };
+  if (!summarizerChain) {
+    // Fallback response when OpenAI is not configured
+    return {
+      summary: "This repository appears to be a software project. Please configure OPENAI_API_KEY environment variable to get AI-powered summaries.",
+      cool_facts: [
+        "AI summarization requires OpenAI API key configuration",
+        "The README content was successfully fetched from the repository",
+        "This is a fallback response due to missing API configuration"
+      ],
+    };
+  }
+
+  try {
+    const result = await summarizerChain.invoke({ readme });
+    return {
+      summary: result.summary,
+      cool_facts: result.cool_facts,
+    };
+  } catch (error) {
+    console.error('Error in AI summarization:', error);
+    // Return a fallback response if AI summarization fails
+    return {
+      summary: "Unable to generate AI summary at this time. The README content was successfully retrieved from the repository.",
+      cool_facts: [
+        "The repository README was successfully fetched",
+        "AI summarization encountered an error",
+        "Please check your OpenAI API configuration"
+      ],
+    };
+  }
 } 

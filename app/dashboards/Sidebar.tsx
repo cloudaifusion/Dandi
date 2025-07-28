@@ -1,26 +1,22 @@
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   open?: boolean;
   onClose?: () => void;
   collapsed?: boolean;
   setCollapsed?: (collapsed: boolean) => void;
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
 }
 
 const navLinks = [
   { name: "Overview", href: "/dashboards", icon: (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
       <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  ) },
-  { name: "Research Assistant", href: "#", icon: (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-      <path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M6.05 17.95l-1.414 1.414M17.95 17.95l-1.414-1.414M6.05 6.05L4.636 7.464" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  ) },
-  { name: "Research Reports", href: "#", icon: (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-      <path d="M7 8h10M7 12h4m1 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   ) },
   { name: "API Playground", href: "/playground", icon: (
@@ -41,9 +37,13 @@ const navLinks = [
   ), external: true },
 ];
 
-export default function Sidebar({ open = false, onClose, collapsed = false, setCollapsed }: SidebarProps) {
+export default function Sidebar({ open = false, onClose, collapsed = false, setCollapsed, user }: SidebarProps) {
   // Only show collapse/expand on desktop
   const handleCollapse = () => setCollapsed && setCollapsed(!collapsed);
+  
+  // Debug: log user data
+  console.log('Sidebar user data:', user);
+  
   return (
     <>
       {/* Overlay for mobile */}
@@ -70,7 +70,7 @@ export default function Sidebar({ open = false, onClose, collapsed = false, setC
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
-        <div className={`mb-10 flex flex-col items-center justify-center`}>
+        <div className={`mb-10 flex flex-col items-center justify-center relative`}>
           {collapsed ? (
             <>
               <span className="w-10 h-10 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-2xl font-bold">D</span>
@@ -91,7 +91,7 @@ export default function Sidebar({ open = false, onClose, collapsed = false, setC
               <span className="text-2xl font-bold tracking-tight transition-all duration-200">Dandi <span className="text-indigo-600">AI</span></span>
               {typeof setCollapsed === 'function' && (
                 <button
-                  className="hidden md:block absolute top-4 right-2 p-2 rounded hover:bg-gray-100"
+                  className="hidden md:block absolute top-0 right-0 p-2 rounded hover:bg-gray-100"
                   onClick={handleCollapse}
                   aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 >
@@ -124,10 +124,47 @@ export default function Sidebar({ open = false, onClose, collapsed = false, setC
           </ul>
         </nav>
         {/* User avatar */}
-        <div className={`mt-auto flex items-center gap-3 pt-8 ${collapsed ? 'justify-center' : ''}`}>
-          <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" className="w-8 h-8 rounded-full border" />
-          {!collapsed && <span className="font-medium text-gray-900 text-sm">Eden Marco</span>}
+        <div className={`mt-auto flex items-center gap-3 pt-8 pb-4 ${collapsed ? 'justify-center' : ''}`}>
+          <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-medium border-2 border-gray-200">
+            {user?.name ? user.name.charAt(0).toUpperCase() : user?.email ? user.email.charAt(0).toUpperCase() : 'U'}
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col">
+              <span className="font-medium text-gray-900 text-sm">{user?.name || 'User'}</span>
+              {user?.email ? (
+                <span className="text-xs text-gray-500">{user.email}</span>
+              ) : (
+                <span className="text-xs text-gray-500">No email available</span>
+              )}
+            </div>
+          )}
         </div>
+        
+        {/* Logout button */}
+        {!collapsed && (
+          <button
+            onClick={() => signOut()}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-red-50 hover:bg-red-100 transition-colors text-red-700 hover:text-red-800 border border-red-200 hover:border-red-300 group"
+          >
+            <svg className="w-4 h-4 text-red-600 group-hover:text-red-700 transition-colors" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="font-medium text-sm">Sign Out</span>
+          </button>
+        )}
+        
+        {/* Collapsed logout button */}
+        {collapsed && (
+          <button
+            onClick={() => signOut()}
+            className="w-full flex items-center justify-center p-2.5 rounded-lg bg-red-50 hover:bg-red-100 transition-colors text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300"
+            title="Sign Out"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        )}
       </aside>
     </>
   );

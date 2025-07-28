@@ -51,12 +51,28 @@ export default function Dashboard() {
 
   const { data: session, status } = useSession();
 
+  // Debug: log session data
+  console.log('Dashboard session data:', session);
+  console.log('Dashboard session user:', session?.user);
+  console.log('Session user name:', session?.user?.name);
+  console.log('Session user email:', session?.user?.email);
+  console.log('Session user image:', session?.user?.image);
+  console.log('Session status:', status);
+  console.log('Is session loading?', status === 'loading');
+  console.log('Is session authenticated?', status === 'authenticated');
+
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
+
+  // Monitor session changes
+  useEffect(() => {
+    console.log('Session changed:', session);
+    console.log('Session user changed:', session?.user);
+  }, [session]);
 
   if (status === "loading") {
     return (
@@ -97,12 +113,17 @@ export default function Dashboard() {
         </button>
       )}
       {(isDesktop || sidebarOpen) && (
-        <Sidebar
-          open={isDesktop ? true : sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-        />
+        <>
+          {console.log('About to render sidebar with session:', session)}
+          {console.log('About to render sidebar with user:', session?.user)}
+          <Sidebar
+            open={isDesktop ? true : sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            user={session?.user}
+          />
+        </>
       )}
       <div className={`flex-1 bg-gray-50 py-10 px-2 overflow-auto transition-all duration-200 ${collapsed ? 'md:ml-16' : 'md:ml-64'}`}>
         {/* Header with sign in/out */}
